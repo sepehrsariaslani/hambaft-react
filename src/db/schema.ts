@@ -1,0 +1,341 @@
+import {
+  pgTable,
+  uuid,
+  text,
+  integer,
+  boolean,
+  timestamp,
+  date,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
+
+/* ══════════════════════════════════════════════════════════
+   همبافت v2 — Schema طراحی‌شده به سبک Supabase (PostgreSQL + RLS-ready)
+   هر جدول owner_id/user_id دارد تا در نسخه Supabase مستقیماً
+   با Row Level Security + auth.uid() قابل محافظت باشد.
+   همین جداول و APIها بعداً توسط اپ React Native مصرف می‌شوند.
+   ══════════════════════════════════════════════════════════ */
+
+export const users = pgTable("users", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  phone: text("phone").notNull().unique(),
+  name: text("name").notNull(),
+  avatarColor: text("avatar_color").notNull().default("#4A6741"),
+  bio: text("bio").notNull().default(""),
+  role: text("role").notNull().default("member"),
+  isDemo: boolean("is_demo").notNull().default(false),
+  totalPoints: integer("total_points").notNull().default(0),
+  level: integer("level").notNull().default(1),
+  streakDays: integer("streak_days").notNull().default(0),
+  lastActiveDate: date("last_active_date"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const sessions = pgTable("sessions", {
+  token: text("token").primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+});
+
+/* ─── حوزه‌های زندگی (Areas) ─── */
+export const areas = pgTable(
+  "areas",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    color: text("color").notNull().default("#7C8363"),
+    icon: text("icon").notNull().default("leaf"),
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (t) => [index("areas_user_idx").on(t.userId)],
+);
+
+/* ─── اهداف ─── */
+export const goals = pgTable(
+  "goals",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    areaId: uuid("area_id").references(() => areas.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    description: text("description").notNull().default(""),
+    category: text("category").notNull().default("personal"),
+    goalType: text("goal_type").notNull().default("outcome"),
+    unit: text("unit").notNull().default(""),
+    targetValue: integer("target_value").notNull().default(100),
+    currentValue: integer("current_value").notNull().default(0),
+    privacy: text("privacy").notNull().default("private"), // private | shared | partners
+    status: text("status").notNull().default("active"), // active | paused | completed | archived
+    scope: text("scope").notNull().default("custom"), // annual | quarterly | monthly | custom
+    totalPoints: integer("total_points").notNull().default(0),
+    deadline: date("deadline"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("goals_owner_idx").on(t.ownerId)],
+);
+
+export const goalMembers = pgTable(
+  "goal_members",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    goalId: uuid("goal_id")
+      .notNull()
+      .references(() => goals.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    role: text("role").notNull().default("partner"),
+    status: text("status").notNull().default("active"),
+    joinedAt: timestamp("joined_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("goal_members_unique").on(t.goalId, t.userId)],
+);
+
+/* ثبت پیشرفت (Check-in روی هدف) */
+export const goalUpdates = pgTable(
+  "goal_updates",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    goalId: uuid("goal_id")
+      .notNull()
+      .references(() => goals.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    valueDelta: integer("value_delta").notNull().default(1),
+    note: text("note").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("goal_updates_goal_idx").on(t.goalId), index("goal_updates_user_idx").on(t.userId)],
+);
+
+/* ─── پروژه‌ها ─── */
+export const projects = pgTable(
+  "projects",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    goalId: uuid("goal_id").references(() => goals.id, { onDelete: "set null" }),
+    areaId: uuid("area_id").references(() => areas.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    status: text("status").notNull().default("active"),
+    color: text("color").notNull().default("#7C8363"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("projects_owner_idx").on(t.ownerId)],
+);
+
+/* ─── تسک‌ها ─── */
+export const tasks = pgTable(
+  "tasks",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    ownerId: uuid("owner_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    projectId: uuid("project_id").references(() => projects.id, { onDelete: "set null" }),
+    goalId: uuid("goal_id").references(() => goals.id, { onDelete: "set null" }),
+    areaId: uuid("area_id").references(() => areas.id, { onDelete: "set null" }),
+    title: text("title").notNull(),
+    description: text("description").notNull().default(""),
+    status: text("status").notNull().default("todo"), // todo | in_progress | done
+    priority: text("priority").notNull().default("medium"), // low | medium | high | urgent
+    dueDate: date("due_date"),
+    scheduledDate: date("scheduled_date"),
+    scheduledTime: text("scheduled_time"),
+    isDailyHighlight: boolean("is_daily_highlight").notNull().default(false),
+    estimatedMinutes: integer("estimated_minutes"),
+    actualMinutes: integer("actual_minutes").notNull().default(0),
+    sortOrder: integer("sort_order").notNull().default(0),
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("tasks_owner_idx").on(t.ownerId), index("tasks_scheduled_idx").on(t.scheduledDate)],
+);
+
+/* ─── عادت‌ها ─── */
+export const habits = pgTable(
+  "habits",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    title: text("title").notNull(),
+    color: text("color").notNull().default("#4A6741"),
+    icon: text("icon").notNull().default("leaf"),
+    targetPerDay: integer("target_per_day").notNull().default(1),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("habits_user_idx").on(t.userId)],
+);
+
+export const habitLogs = pgTable(
+  "habit_logs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    habitId: uuid("habit_id")
+      .notNull()
+      .references(() => habits.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    logDate: date("log_date").notNull(),
+    count: integer("count").notNull().default(1),
+    note: text("note").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("habit_logs_unique").on(t.habitId, t.logDate),
+    index("habit_logs_user_date_idx").on(t.userId, t.logDate),
+  ],
+);
+
+/* ─── گیمیفیکیشن ─── */
+export const pointEvents = pgTable(
+  "point_events",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    points: integer("points").notNull(),
+    reason: text("reason").notNull(),
+    refType: text("ref_type").notNull().default(""),
+    refId: text("ref_id").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("point_events_user_idx").on(t.userId)],
+);
+
+export const badges = pgTable("badges", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  icon: text("icon").notNull().default("medal"),
+  category: text("category").notNull().default("general"),
+  threshold: integer("threshold").notNull().default(1),
+  points: integer("points").notNull().default(0),
+});
+
+export const userBadges = pgTable(
+  "user_badges",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    badgeId: text("badge_id")
+      .notNull()
+      .references(() => badges.id, { onDelete: "cascade" }),
+    awardedAt: timestamp("awarded_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("user_badges_unique").on(t.userId, t.badgeId)],
+);
+
+/* ─── چالش‌های روزانه ─── */
+export const challenges = pgTable("challenges", {
+  id: text("id").primaryKey(),
+  title: text("title").notNull(),
+  description: text("description").notNull(),
+  metric: text("metric").notNull(), // task_done | habit_log | goal_update | reaction_given | comment | points_earned | all_habits | high_priority | highlight_done | shared_goal
+  targetCount: integer("target_count").notNull().default(1),
+  points: integer("points").notNull().default(20),
+  difficulty: text("difficulty").notNull().default("easy"), // easy | medium | hard
+});
+
+export const userChallenges = pgTable(
+  "user_challenges",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    challengeId: text("challenge_id")
+      .notNull()
+      .references(() => challenges.id, { onDelete: "cascade" }),
+    assignedDate: date("assigned_date").notNull(),
+    targetCount: integer("target_count").notNull(),
+    progress: integer("progress").notNull().default(0),
+    status: text("status").notNull().default("active"), // active | completed
+    completedAt: timestamp("completed_at", { withTimezone: true }),
+  },
+  (t) => [index("user_challenges_user_date_idx").on(t.userId, t.assignedDate)],
+);
+
+/* ─── اجتماعی ─── */
+export const partnerships = pgTable(
+  "partnerships",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    partnerId: uuid("partner_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    status: text("status").notNull().default("active"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("partnerships_unique").on(t.userId, t.partnerId)],
+);
+
+export const comments = pgTable(
+  "comments",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    targetType: text("target_type").notNull().default("goal"),
+    targetId: uuid("target_id").notNull(),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("comments_target_idx").on(t.targetType, t.targetId)],
+);
+
+export const reactions = pgTable(
+  "reactions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    targetType: text("target_type").notNull().default("goal"),
+    targetId: uuid("target_id").notNull(),
+    kind: text("kind").notNull().default("cheer"), // cheer | fire | clap | heart
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("reactions_unique").on(t.userId, t.targetType, t.targetId, t.kind)],
+);
+
+export const notifications = pgTable(
+  "notifications",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    actorId: uuid("actor_id").references(() => users.id, { onDelete: "set null" }),
+    type: text("type").notNull().default("info"), // nudge | badge | points | reaction | comment | challenge | partner
+    title: text("title").notNull(),
+    body: text("body").notNull().default(""),
+    refType: text("ref_type").notNull().default(""),
+    refId: text("ref_id").notNull().default(""),
+    read: boolean("read").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("notifications_user_idx").on(t.userId, t.read)],
+);

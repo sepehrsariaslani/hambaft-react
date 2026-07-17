@@ -1,0 +1,294 @@
+@import url("https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css");
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #f9f6ee;
+  --color-paper: #fdfbf7;
+  --color-ink: #2d3025;
+  --color-ink2: #3d4133;
+  --color-night: #1b1d16;
+  --color-moss: #4a6741;
+  --color-moss-deep: #3b5434;
+  --color-sage: #7c8363;
+  --color-sage-soft: #aab18f;
+  --color-taupe: #8d7f72;
+  --color-terra: #e26645;
+  --color-terra-deep: #c94f30;
+  --color-clay: #9b6b61;
+  --color-line: #e6dfd3;
+  --color-mist: #e8ece0;
+  --color-sand: #d6cfc3;
+  --color-gold: #d6a94b;
+  --color-blush: #edddd7;
+  --font-sans: "Vazirmatn", "Tahoma", ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  min-height: 100dvh;
+}
+
+::selection {
+  background: var(--color-moss);
+  color: #fff;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-sand);
+  border-radius: 99px;
+  border: 2px solid var(--color-cream);
+}
+
+/* ─── بافت کاغذی ظریف ─── */
+.texture-paper {
+  background-image: radial-gradient(ellipse at 20% 0%, rgba(124, 131, 99, 0.07), transparent 55%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.18 0 0 0 0 0.19 0 0 0 0 0.15 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ─── کارت ─── */
+.card {
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: 22px;
+  box-shadow:
+    0 1px 2px rgba(45, 48, 37, 0.04),
+    0 8px 24px -12px rgba(45, 48, 37, 0.08);
+}
+
+.card-hover {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s;
+}
+.card-hover:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 2px 4px rgba(45, 48, 37, 0.05),
+    0 18px 40px -16px rgba(45, 48, 37, 0.16);
+}
+
+.card-press {
+  transition: transform 0.15s ease-out;
+}
+.card-press:active {
+  transform: scale(0.975);
+}
+
+/* ─── تایپوگرافی ─── */
+.display {
+  font-weight: 900;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+.num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── انیمیشن‌ها ─── */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes ringdraw {
+  from {
+    stroke-dashoffset: var(--offset-from, 400);
+  }
+}
+
+.anim-rise {
+  animation: rise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.anim-pop {
+  animation: pop 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.stagger > * {
+  animation: rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.stagger > *:nth-child(1) { animation-delay: 0.03s; }
+.stagger > *:nth-child(2) { animation-delay: 0.08s; }
+.stagger > *:nth-child(3) { animation-delay: 0.13s; }
+.stagger > *:nth-child(4) { animation-delay: 0.18s; }
+.stagger > *:nth-child(5) { animation-delay: 0.23s; }
+.stagger > *:nth-child(6) { animation-delay: 0.28s; }
+.stagger > *:nth-child(7) { animation-delay: 0.33s; }
+.stagger > *:nth-child(8) { animation-delay: 0.38s; }
+
+.floaty {
+  animation: floaty 5s ease-in-out infinite;
+}
+.breathe {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+/* ─── ناوبری پایین (موبایل) ─── */
+.nav-item {
+  transition: color 0.25s, transform 0.25s;
+}
+.nav-item[data-active="true"] {
+  color: var(--color-moss);
+}
+.nav-fab {
+  box-shadow:
+    0 10px 26px -8px rgba(226, 102, 69, 0.55),
+    0 2px 8px rgba(226, 102, 69, 0.3);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.nav-fab:hover {
+  transform: translateY(-4px) rotate(90deg);
+}
+.nav-fab:active {
+  transform: scale(0.92) rotate(90deg);
+}
+
+/* ─── تیک تسک ─── */
+.checkbox {
+  transition: all 0.22s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.checkbox[data-done="true"] {
+  background: var(--color-moss);
+  border-color: var(--color-moss);
+}
+.checkbox svg {
+  opacity: 0;
+  transform: scale(0.4) rotate(-20deg);
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.checkbox[data-done="true"] svg {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+}
+
+/* ─── دات عادت ─── */
+.habit-dot {
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.habit-dot[data-on="true"] {
+  transform: scale(1.06);
+}
+.habit-dot:active {
+  transform: scale(0.85);
+}
+
+/* ─── progress bar انیمیشنی ─── */
+.bar-fill {
+  transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ─── حلقهٔ سطح ─── */
+.ring-anim {
+  animation: ringdraw 1.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ─── هدر شیشه‌ای ─── */
+.glass {
+  backdrop-filter: blur(14px) saturate(1.4);
+  background: rgba(249, 246, 238, 0.82);
+}
+
+/* ─── سکه‌های تلالوئ امتیاز ─── */
+.coin {
+  background: radial-gradient(circle at 32% 28%, #f2d78c, #d6a94b 60%, #b8892f);
+  box-shadow: inset 0 -2px 4px rgba(120, 84, 20, 0.4), 0 2px 6px rgba(120, 84, 20, 0.25);
+}
+
+/* ─── ورودی‌ها ─── */
+.input {
+  width: 100%;
+  background: #fff;
+  border: 1.5px solid var(--color-line);
+  border-radius: 16px;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--color-ink);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.input::placeholder {
+  color: var(--color-taupe);
+}
+.input:focus {
+  border-color: var(--color-moss);
+  box-shadow: 0 0 0 4px rgba(74, 103, 65, 0.12);
+}
+
+/* ─── چیپ واکنش ─── */
+.reaction-chip {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.reaction-chip[data-on="true"] {
+  background: var(--color-mist);
+  border-color: var(--color-sage);
+}
+.reaction-chip:active {
+  transform: scale(1.12);
+}
+
+/* ─── کد جهت نمایش معماری (direction fix) ─── */
+.ltr {
+  direction: ltr;
+}
+
+/* ─── safe area برای موبایل ─── */
+.safe-b {
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+}
