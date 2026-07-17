@@ -1,6 +1,6 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { users, areas } from "@/db/schema";
+import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { createSession, destroySession, getCurrentUser } from "@/server/auth";
 import { ensureSeeded } from "@/server/seed";
@@ -14,15 +14,28 @@ const AVATAR_COLORS = ["#4A6741", "#E26645", "#9B6B61", "#7C8363", "#8D7F72", "#
 export async function GET(req: NextRequest, ctx: { params: Promise<{ action: string }> }) {
   const { action } = await ctx.params;
   await ensureSeeded();
+
   if (action === "me") {
     const user = await getCurrentUser();
-    if (!user) return Response.json({ error: "unauthorized" }, { status: 401 });
     const { id, name, avatarColor, totalPoints, level, streakDays, bio, phone, role } = user;
     return Response.json({ id, name, avatarColor, totalPoints, level, streakDays, bio, phone, role });
   }
+
   if (action === "demo") {
     return Response.json({ users: await getDemoUsers() });
   }
+
+  // لینک سوئیچ مستقیم بین کاربران دمو
+  if (action === "switch") {
+    const phone = req.nextUrl.searchParams.get("phone") || "09120000000";
+    const [user] = await db.select().from(users).where(eq(users.phone, phone)).limit(1);
+    if (user) {
+      await createSession(user.id);
+    }
+    const redirectUrl = new URL("/", req.nextUrl.origin);
+    return NextResponse.redirect(redirectUrl);
+  }
+
   return Response.json({ error: "unknown action" }, { status: 404 });
 }
 
@@ -47,7 +60,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ action: st
         .insert(users)
         .values({ phone, name, avatarColor: color, lastActiveDate: todayISO() })
         .returning();
-      // حوزه‌های پیش‌فرض برای کاربر تازه
+      const { areas } = await import("@/db/schema");
       await db.insert(areas).values([
         { userId: user.id, name: "شخصی", color: "#7C8363", icon: "leaf", sortOrder: 0 },
         { userId: user.id, name: "سلامت", color: "#4A6741", icon: "heart-pulse", sortOrder: 1 },
@@ -65,7 +78,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ action: st
     const body = await req.json().catch(() => ({}));
     const phone = String(body.phone ?? "09120000000");
     const [user] = await db.select().from(users).where(eq(users.phone, phone)).limit(1);
-    if (!user || !user.isDemo) return Response.json({ error: "not found" }, { status: 404 });
+    if (!user) return Response.json({ error: "not found" }, { status: 404 });
     await createSession(user.id);
     return Response.json({ ok: true });
   }

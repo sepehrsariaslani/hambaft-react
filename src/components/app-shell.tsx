@@ -52,25 +52,39 @@ export function AppShell({
             <span className="display text-[17px] text-ink">همبافت</span>
           </Link>
           <div className="flex items-center gap-2">
+            {/* سوئیچر سریع کاربران دمو */}
+            <div className="flex items-center gap-1 bg-mist/60 px-1.5 py-1 rounded-2xl border border-line/60">
+              {[
+                { name: "سپهر", phone: "09120000000", color: "#4A6741" },
+                { name: "نیما", phone: "09121111111", color: "#E26645" },
+                { name: "سارا", phone: "09122222222", color: "#9B6B61" },
+                { name: "مریم", phone: "09123333333", color: "#7C8363" },
+              ].map((u) => (
+                <a
+                  key={u.phone}
+                  href={`/api/auth/switch?phone=${u.phone}`}
+                  title={`سوئیچ به ${u.name}`}
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-white text-[9.5px] font-black transition-transform active:scale-90 ${
+                    userName.startsWith(u.name) ? "ring-2 ring-moss ring-offset-1 scale-110" : "opacity-70 hover:opacity-100"
+                  }`}
+                  style={{ background: u.color }}
+                >
+                  {u.name[0]}
+                </a>
+              ))}
+            </div>
+
             <Link
               href="/notifications"
-              className="relative w-9 h-9 rounded-xl bg-paper border border-line flex items-center justify-center text-ink2 hover:text-moss transition-colors"
+              className="relative w-8 h-8 rounded-xl bg-paper border border-line flex items-center justify-center text-ink2 hover:text-moss transition-colors"
               aria-label="اعلان‌ها"
             >
-              <Bell size={17} strokeWidth={2.2} />
+              <Bell size={15} strokeWidth={2.2} />
               {unreadCount > 0 && (
-                <span className="absolute -top-1 -left-1 min-w-[16px] h-4 px-1 rounded-full bg-terra text-white text-[9px] font-black flex items-center justify-center num">
+                <span className="absolute -top-1 -left-1 min-w-[15px] h-3.5 px-0.5 rounded-full bg-terra text-white text-[8.5px] font-black flex items-center justify-center num">
                   {unreadCount > 9 ? "۹+" : unreadCount}
                 </span>
               )}
-            </Link>
-            <Link
-              href="/profile"
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-white text-[13px] font-black"
-              style={{ background: userColor }}
-              aria-label="پروفایل"
-            >
-              {initials}
             </Link>
           </div>
         </div>

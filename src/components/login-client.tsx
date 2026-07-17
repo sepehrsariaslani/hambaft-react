@@ -1,9 +1,10 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { Phone, User, ArrowLeft, Sparkles, ShieldCheck, Flame, Target } from "lucide-react";
+import { Phone, User, ArrowLeft, Sparkles, ShieldCheck, Flame, Target, UserCheck } from "lucide-react";
 
 interface DemoUser {
   id: string;
@@ -21,7 +22,6 @@ export function LoginClient({ demoUsers }: { demoUsers: DemoUser[] }) {
   const [needName, setNeedName] = useState(false);
   const [error, setError] = useState("");
   const [pending, start] = useTransition();
-  const [demoPending, setDemoPending] = useState<string | null>(null);
 
   const submit = () => {
     setError("");
@@ -39,21 +39,6 @@ export function LoginClient({ demoUsers }: { demoUsers: DemoUser[] }) {
         if (data.needName) setNeedName(true);
         setError(data.error ?? "مشکلی پیش آمد");
       }
-    });
-  };
-
-  const demoLogin = (u: DemoUser) => {
-    setDemoPending(u.id);
-    start(async () => {
-      const res = await fetch("/api/auth/demo-login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: u.phone }),
-      });
-      if (res.ok) {
-        router.replace("/");
-        router.refresh();
-      } else setDemoPending(null);
     });
   };
 
@@ -105,9 +90,26 @@ export function LoginClient({ demoUsers }: { demoUsers: DemoUser[] }) {
           <p className="text-xs text-taupe font-bold mt-1">زندگی هم‌مسیر — با هم بافته می‌شویم</p>
         </div>
 
-        <h1 className="hidden md:block display text-3xl text-ink">سلام، خوش اومدی</h1>
-        <p className="text-[13px] text-taupe mt-1 mb-6 leading-6">
-          با شمارهٔ موبایلت وارد شو؛ اگر بار اولت است، حسابت همین‌جا ساخته می‌شود.
+        {/* دکمهٔ ورود سریع یک‌لمسی به برنامه */}
+        <Link
+          href="/"
+          className="card card-hover p-4 mb-6 bg-moss/10 border-moss/30 flex items-center justify-between text-moss text-right"
+        >
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-2xl bg-moss text-white flex items-center justify-center shrink-0">
+              <UserCheck size={20} />
+            </span>
+            <div>
+              <p className="text-sm font-black">ورود مستقیم به برنامه</p>
+              <p className="text-[11px] text-taupe font-bold">بدون نیاز به لاگین (حساب سپهر صریراصلانی)</p>
+            </div>
+          </div>
+          <ArrowLeft size={18} />
+        </Link>
+
+        <h1 className="hidden md:block display text-2xl text-ink">ورود با شماره موبایل</h1>
+        <p className="text-[13px] text-taupe mt-1 mb-4 leading-6">
+          می‌توانی مستقیم شماره وارد کنی یا از اکانت‌های دمو یکی را انتخاب کنی:
         </p>
 
         <label className="text-[11px] font-black text-ink2 mb-1.5 block">شمارهٔ موبایل</label>
@@ -145,47 +147,42 @@ export function LoginClient({ demoUsers }: { demoUsers: DemoUser[] }) {
         <button
           onClick={submit}
           disabled={pending || phone.length < 10}
-          className="mt-5 w-full h-12 rounded-2xl bg-moss text-white font-black text-[15px] flex items-center justify-center gap-2 hover:bg-moss-deep transition-colors disabled:opacity-40 active:scale-[0.98]"
+          className="mt-4 w-full h-11 rounded-2xl bg-moss text-white font-black text-[14px] flex items-center justify-center gap-2 hover:bg-moss-deep transition-colors disabled:opacity-40 active:scale-[0.98]"
         >
-          {pending && !demoPending ? "در حال ورود…" : "ورود / ساخت حساب"}
-          <ArrowLeft size={17} />
+          {pending ? "در حال ورود…" : "ورود / ساخت حساب"}
+          <ArrowLeft size={16} />
         </button>
 
-        <div className="flex items-center gap-3 my-6">
+        <div className="flex items-center gap-3 my-5">
           <span className="flex-1 h-px bg-line" />
-          <span className="text-[10px] font-black text-taupe">یا نسخهٔ نمایشی را ببین</span>
+          <span className="text-[10px] font-black text-taupe">سوئیچ سریع اکانت‌های دمو</span>
           <span className="flex-1 h-px bg-line" />
         </div>
 
         <div className="grid grid-cols-2 gap-2 stagger">
           {demoUsers.map((u) => (
-            <button
+            <a
               key={u.id}
-              onClick={() => demoLogin(u)}
-              disabled={pending}
-              className="card card-press card-hover p-3 flex items-center gap-2.5 text-right disabled:opacity-50"
+              href={`/api/auth/switch?phone=${u.phone}`}
+              className="card card-press card-hover p-3 flex items-center gap-2.5 text-right"
             >
               <span
-                className="w-9 h-9 rounded-full flex items-center justify-center text-white text-[12px] font-black shrink-0 relative"
+                className="w-9 h-9 rounded-full flex items-center justify-center text-white text-[12px] font-black shrink-0"
                 style={{ background: u.color }}
               >
-                {demoPending === u.id ? (
-                  <span className="w-4 h-4 border-2 border-white/50 border-t-white rounded-full animate-spin" />
-                ) : (
-                  u.name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("")
-                )}
+                {u.name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join("")}
               </span>
               <span className="min-w-0">
                 <span className="block text-[12px] font-black text-ink truncate">{u.name.split(" ")[0]}</span>
                 <span className="block text-[9.5px] text-taupe font-bold">سطح {u.level<10?["","۱","۲","۳","۴","۵","۶","۷","۸","۹"][u.level]:u.level}</span>
               </span>
-            </button>
+            </a>
           ))}
         </div>
 
-        <p className="flex items-center justify-center gap-1.5 text-[10px] text-taupe mt-8">
+        <p className="flex items-center justify-center gap-1.5 text-[10px] text-taupe mt-6">
           <ShieldCheck size={12} className="text-sage" />
-          نسخهٔ α · Next.js + PostgreSQL — آمادهٔ مهاجرت به Supabase
+          همبافت v2 — Next.js + PostgreSQL (Supabase Architecture)
         </p>
       </div>
     </div>
