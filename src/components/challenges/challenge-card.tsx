@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Target, Star, Check, X, ClipboardList } from "lucide-react";
 
 export interface DailyChallengeItem {
   id: string;
@@ -36,16 +37,16 @@ export function ChallengeCard({ challenge }: { challenge: DailyChallengeItem }) 
     >
       {isCompleted && (
         <motion.div
-          className="absolute top-2 left-2 w-6 h-6 bg-[#4A6741] rounded-full flex items-center justify-center text-white text-xs font-black"
+          className="absolute top-2 left-2 w-6 h-6 bg-[#4A6741] rounded-full flex items-center justify-center text-white"
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
         >
-          ✓
+          <Check className="w-3.5 h-3.5" />
         </motion.div>
       )}
 
       <div className="flex items-start gap-3">
-        <div className="text-2xl mt-0.5">{challenge.icon || "🎯"}</div>
+        <Target className="w-6 h-6 text-[#4A6741] mt-0.5 shrink-0" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <h4 className={`text-xs font-black ${isCompleted ? "text-[#8D7F72] line-through" : "text-[#2D3025]"}`}>
@@ -61,9 +62,11 @@ export function ChallengeCard({ challenge }: { challenge: DailyChallengeItem }) 
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[9px]">
               <span className={`font-bold ${isCompleted ? "text-[#4A6741]" : diff.text}`}>
-                {isCompleted ? "تکمیل شد! 🎉" : `${challenge.progress} از ${challenge.targetCount}`}
+                {isCompleted ? "تکمیل شد!" : `${challenge.progress} از ${challenge.targetCount}`}
               </span>
-              <span className="text-[#8D7F72] font-black">+{challenge.pointsReward} ⭐</span>
+              <span className="text-[#8D7F72] font-black flex items-center gap-0.5">
+                +{challenge.pointsReward} <Star className="w-3 h-3 text-[#D6A94B] inline" />
+              </span>
             </div>
             <div className="h-2 bg-white/70 rounded-full overflow-hidden">
               <motion.div
@@ -95,7 +98,7 @@ export function DailyChallengesDisplay() {
             id: c.id,
             title: c.title_fa || c.title,
             description: c.description_fa || c.description,
-            icon: c.icon || "🎯",
+            icon: c.icon || "target",
             difficulty: c.difficulty,
             progress: c.progress,
             targetCount: c.target_count,
@@ -132,19 +135,21 @@ export function DailyChallengesDisplay() {
       <div className="flex bg-[#F9F6EE] p-1 rounded-2xl border border-[#E6DFD3] gap-1">
         <button
           onClick={() => setActiveTab("today")}
-          className={`flex-1 py-2 text-[10px] font-black rounded-xl cursor-pointer transition-all ${
+          className={`flex-1 py-2 text-[10px] font-black rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1 ${
             activeTab === "today" ? "bg-[#4A6741] text-white" : "text-[#8D7F72]"
           }`}
         >
-          🎯 چالش‌های امروز ({completedCount}/{challenges.length})
+          <Target className="w-3.5 h-3.5" />
+          <span>چالش‌های امروز ({completedCount}/{challenges.length})</span>
         </button>
         <button
           onClick={() => setActiveTab("history")}
-          className={`flex-1 py-2 text-[10px] font-black rounded-xl cursor-pointer transition-all ${
+          className={`flex-1 py-2 text-[10px] font-black rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1 ${
             activeTab === "history" ? "bg-[#2D3025] text-white" : "text-[#8D7F72]"
           }`}
         >
-          📋 تاریخچه چالش‌ها
+          <ClipboardList className="w-3.5 h-3.5" />
+          <span>تاریخچه چالش‌ها</span>
         </button>
       </div>
 
@@ -164,7 +169,7 @@ export function DailyChallengesDisplay() {
             ) : (
               history.map((item) => (
                 <div key={item.id} className="flex items-center gap-2 p-2.5 bg-white border border-[#E6DFD3] rounded-xl">
-                  <div className="text-xl">{item.icon || "🎯"}</div>
+                  <Target className="w-4 h-4 text-[#4A6741]" />
                   <div className="flex-1 min-w-0">
                     <div className="text-[10px] font-black text-[#2D3025] truncate">{item.title_fa || item.title}</div>
                     <div className="text-[8px] text-[#8D7F72]">{item.challenge_date}</div>
@@ -172,7 +177,7 @@ export function DailyChallengesDisplay() {
                   <span
                     className={`text-xs font-black ${item.status === "تکمیل‌شده" ? "text-[#4A6741]" : "text-[#8D7F72]"}`}
                   >
-                    {item.status === "تکمیل‌شده" ? "✓" : "✗"}
+                    {item.status === "تکمیل‌شده" ? <Check className="w-4 h-4 text-emerald-600" /> : <X className="w-4 h-4 text-red-500" />}
                   </span>
                 </div>
               ))

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Sparkles, Send, HelpCircle, TrendingUp, Target, Flame } from "lucide-react";
+import { Sparkles, Send, Sprout, Flame, Target, TrendingUp } from "lucide-react";
 
 interface Message {
   id: string;
@@ -61,8 +61,8 @@ export function CoachClient() {
           <div className="text-[10px] text-white/70 font-bold">مربی هوشمند همبافت</div>
           <h1 className="text-lg font-black font-serif-elegant">«یار» — مربی و تحلیل‌گر توازن</h1>
         </div>
-        <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-2xl">
-          🌿
+        <div className="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center text-white">
+          <Sprout className="w-6 h-6" />
         </div>
       </div>
 
@@ -98,15 +98,17 @@ export function CoachClient() {
         <div className="px-3 py-2 border-t border-[#E6DFD3] flex gap-1.5 overflow-x-auto bg-[#F9F6EE]">
           <button
             onClick={() => sendMessage("وضعیت توازن زندگی من را تحلیل کن.")}
-            className="px-3 py-1 bg-white border border-[#E6DFD3] text-[9px] font-black text-[#2D3025] rounded-xl shrink-0 cursor-pointer hover:bg-[#E8ECE0]"
+            className="px-3 py-1 bg-white border border-[#E6DFD3] text-[9px] font-black text-[#2D3025] rounded-xl shrink-0 cursor-pointer hover:bg-[#E8ECE0] flex items-center gap-1"
           >
-            🌱 تحلیل کل زندگی
+            <Sprout className="w-3.5 h-3.5 text-[#4A6741]" />
+            <span>تحلیل کل زندگی</span>
           </button>
           <button
             onClick={() => sendMessage("چگونه استمرار عادت‌ها را حفظ کنم؟")}
-            className="px-3 py-1 bg-white border border-[#E6DFD3] text-[9px] font-black text-[#E26645] rounded-xl shrink-0 cursor-pointer hover:bg-[#FDE8E3]"
+            className="px-3 py-1 bg-white border border-[#E6DFD3] text-[9px] font-black text-[#E26645] rounded-xl shrink-0 cursor-pointer hover:bg-[#FDE8E3] flex items-center gap-1"
           >
-            🔥 استمرار عادت‌ها
+            <Flame className="w-3.5 h-3.5 text-[#E26645]" />
+            <span>استمرار عادت‌ها</span>
           </button>
         </div>
 

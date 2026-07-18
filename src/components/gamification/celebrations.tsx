@@ -2,6 +2,7 @@
 
 import React, { useEffect } from "react";
 import { motion } from "framer-motion";
+import { Sparkles, Trophy } from "lucide-react";
 
 export function LevelUpCelebration({ level, onClose }: { level: number; onClose: () => void }) {
   useEffect(() => {
@@ -22,13 +23,7 @@ export function LevelUpCelebration({ level, onClose }: { level: number; onClose:
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 20 }}
       >
-        <motion.div
-          className="text-6xl mb-3"
-          animate={{ rotate: [0, -10, 10, -5, 5, 0] }}
-          transition={{ duration: 0.6, repeat: 2 }}
-        >
-          🎉
-        </motion.div>
+        <Sparkles className="w-16 h-16 text-[#D6A94B] mx-auto mb-3" />
         <h2 className="text-lg font-black text-[#2D3025] mb-1">ارتقای سطح!</h2>
         <p className="text-3xl font-black text-[#4A6741] mb-2">سطح {level}</p>
         <p className="text-xs text-[#8D7F72] mb-5">تبریک! هم‌بافته‌ای که تو هستی هر روز تازه‌تر می‌شود.</p>
@@ -36,7 +31,7 @@ export function LevelUpCelebration({ level, onClose }: { level: number; onClose:
           onClick={onClose}
           className="px-6 py-2.5 bg-[#2D3025] text-white rounded-2xl text-xs font-black cursor-pointer hover:opacity-90"
         >
-          ادامه مسیر 💪
+          ادامه مسیر
         </button>
       </motion.div>
     </motion.div>
@@ -68,13 +63,7 @@ export function BadgeEarnedCelebration({
         animate={{ scale: 1, opacity: 1, rotate: 0 }}
         transition={{ type: "spring", stiffness: 400, damping: 15 }}
       >
-        <motion.div
-          className="text-5xl mb-3"
-          animate={{ scale: [1, 1.3, 1] }}
-          transition={{ duration: 0.5, repeat: 3 }}
-        >
-          {badge.icon || "🏆"}
-        </motion.div>
+        <Trophy className="w-12 h-12 text-[#D6A94B] mx-auto mb-3" />
         <h2 className="text-sm font-black text-[#2D3025] mb-1">نشان جدید کسب کردی!</h2>
         <p className="text-base font-black text-[#4A6741]">{badge.badge_name_fa}</p>
       </motion.div>

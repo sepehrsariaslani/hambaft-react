@@ -1,10 +1,17 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { MessageCircle, Trash2, Send } from "lucide-react";
+import { MessageCircle, Send, Flame, ThumbsUp, Zap, Heart, CheckCircle2, Sparkles, Plus, type LucideIcon } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const REACTION_EMOJIS = ["🔥", "👏", "💪", "❤️", "✅", "🎉"];
+const REACTION_ICONS: { id: string; label: string; icon: LucideIcon; color: string }[] = [
+  { id: "fire", label: "آتشی", icon: Flame, color: "text-orange-500" },
+  { id: "cheer", label: "دمت گرم", icon: ThumbsUp, color: "text-blue-500" },
+  { id: "clap", label: "آفرین", icon: Zap, color: "text-[#D6A94B]" },
+  { id: "heart", label: "دوستت دارم", icon: Heart, color: "text-red-500" },
+  { id: "done", label: "عالی", icon: CheckCircle2, color: "text-emerald-500" },
+  { id: "party", label: "جشن", icon: Sparkles, color: "text-purple-500" },
+];
 
 export interface CommentItem {
   id: string;
@@ -18,7 +25,7 @@ export interface CommentItem {
 }
 
 export interface ReactionGroup {
-  emoji: string;
+  kind: string;
   count: number;
   myReaction: boolean;
 }
@@ -29,19 +36,14 @@ export function CommentReactions({ entityType, entityId }: { entityType: string;
   const [newComment, setNewComment] = useState("");
   const [showComments, setShowComments] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     if (!entityId) return;
-    setLoading(true);
     try {
-      const [commentsRes, reactionsRes] = await Promise.all([
-        fetch(`/api/goals/${entityId}/engage`).then((r) => r.json()),
-        fetch(`/api/goals/${entityId}/engage`).then((r) => r.json()),
-      ]);
-      if (commentsRes?.comments) {
+      const res = await fetch(`/api/goals/${entityId}/engage`).then((r) => r.json());
+      if (res?.comments) {
         setComments(
-          commentsRes.comments.map((c: any) => ({
+          res.comments.map((c: any) => ({
             id: c.c.id,
             body: c.c.body,
             createdAt: c.c.createdAt,
@@ -52,19 +54,17 @@ export function CommentReactions({ entityType, entityId }: { entityType: string;
           }))
         );
       }
-      if (reactionsRes?.reactions) {
+      if (res?.reactions) {
         setReactions(
-          reactionsRes.reactions.map((r: any) => ({
-            emoji: r.kind === "cheer" ? "👏" : r.kind === "fire" ? "🔥" : r.kind === "clap" ? "💪" : "❤️",
+          res.reactions.map((r: any) => ({
+            kind: r.kind,
             count: Number(r.n) || 1,
-            myReaction: (reactionsRes.myReactions || []).includes(r.kind),
+            myReaction: (res.myReactions || []).includes(r.kind),
           }))
         );
       }
     } catch (err) {
       console.error("Fetch comments/reactions failed", err);
-    } finally {
-      setLoading(false);
     }
   }, [entityId]);
 
@@ -94,11 +94,10 @@ export function CommentReactions({ entityType, entityId }: { entityType: string;
 
   const handleToggleReaction = async (kind: string) => {
     try {
-      const reactionKind = kind === "👏" ? "cheer" : kind === "🔥" ? "fire" : kind === "💪" ? "clap" : "heart";
       await fetch(`/api/goals/${entityId}/engage`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "reaction", kind: reactionKind }),
+        body: JSON.stringify({ type: "reaction", kind }),
       });
       fetchData();
     } catch (err) {
@@ -109,47 +108,37 @@ export function CommentReactions({ entityType, entityId }: { entityType: string;
   const totalReactions = reactions.reduce((sum, r) => sum + r.count, 0);
 
   return (
-    <div className="space-y-2 text-right">
-      {/* Reactions bar */}
+    <div className="space-y-2 text-right" dir="rtl">
+      {/* Reactions Bar with Lucide Icons */}
       <div className="flex items-center gap-1.5 flex-wrap">
-        {reactions.map((r) => (
-          <button
-            key={r.emoji}
-            onClick={() => handleToggleReaction(r.emoji)}
-            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold cursor-pointer transition-all ${
-              r.myReaction
-                ? "bg-[#4A6741]/20 text-[#4A6741] border border-[#4A6741]/40"
-                : "bg-[#E6DFD3]/40 text-[#8D7F72] border border-transparent hover:border-[#E6DFD3]"
-            }`}
-          >
-            <span>{r.emoji}</span>
-            <span>{r.count}</span>
-          </button>
-        ))}
-        {/* Add reaction picker */}
-        <div className="relative group">
-          <button className="px-2 py-0.5 rounded-full text-[10px] font-bold text-[#8D7F72] cursor-pointer hover:bg-[#E6DFD3]/40 border border-dashed border-[#E6DFD3]">
-            +😊
-          </button>
-          <div className="absolute bottom-full right-0 mb-1 hidden group-hover:flex bg-white dark:bg-[#20241A] border border-[#E6DFD3] rounded-2xl p-1.5 shadow-lg z-10 gap-1">
-            {REACTION_EMOJIS.map((e) => (
-              <button
-                key={e}
-                onClick={() => handleToggleReaction(e)}
-                className="w-7 h-7 flex items-center justify-center text-sm cursor-pointer hover:bg-[#E6DFD3]/40 rounded-xl transition-colors"
-              >
-                {e}
-              </button>
-            ))}
-          </div>
-        </div>
+        {REACTION_ICONS.map((r) => {
+          const Icon = r.icon;
+          const existing = reactions.find((rg) => rg.kind === r.id);
+          const isMine = existing?.myReaction;
+          const count = existing?.count || 0;
+
+          return (
+            <button
+              key={r.id}
+              onClick={() => handleToggleReaction(r.id)}
+              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black cursor-pointer transition-all ${
+                isMine
+                  ? "bg-[#4A6741] text-white"
+                  : "bg-[#F9F6EE] text-[#8D7F72] border border-[#E6DFD3] hover:border-[#4A6741]"
+              }`}
+            >
+              <Icon className={`w-3.5 h-3.5 ${isMine ? "text-white" : r.color}`} />
+              {count > 0 && <span>{count}</span>}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Comments toggle button */}
-      <div className="flex items-center gap-2">
+      {/* Comments Toggle */}
+      <div className="flex items-center gap-2 pt-1">
         <button
           onClick={() => setShowComments(!showComments)}
-          className="text-[10px] font-black text-[#4A6741] cursor-pointer hover:opacity-80 flex items-center gap-1"
+          className="text-[10px] font-black text-[#4A6741] cursor-pointer hover:underline flex items-center gap-1"
         >
           <MessageCircle className="w-3.5 h-3.5" />
           <span>دیدگاه‌ها</span>
@@ -157,7 +146,7 @@ export function CommentReactions({ entityType, entityId }: { entityType: string;
             <span className="bg-[#4A6741]/10 px-1.5 py-0.5 rounded-full text-[9px]">{comments.length}</span>
           )}
         </button>
-        {totalReactions > 0 && <span className="text-[9px] text-[#8D7F72]">{totalReactions} واکنش</span>}
+        {totalReactions > 0 && <span className="text-[9px] text-[#8D7F72]">{totalReactions} واکنش ثبت شده</span>}
       </div>
 
       {/* Comments section */}
@@ -172,24 +161,22 @@ export function CommentReactions({ entityType, entityId }: { entityType: string;
             <div className="space-y-1.5 max-h-60 overflow-y-auto">
               {comments.length > 0 ? (
                 comments.map((c) => (
-                  <div key={c.id} className="p-2 bg-white dark:bg-[#20241A] border border-[#E6DFD3]/40 rounded-xl">
+                  <div key={c.id} className="p-2.5 bg-[#F9F6EE] border border-[#E6DFD3] rounded-2xl">
                     <div className="flex items-center justify-between gap-1.5 mb-1">
                       <div className="flex items-center gap-1.5">
                         <span
-                          className="w-4 h-4 rounded-full text-white text-[8px] font-black flex items-center justify-center"
+                          className="w-5 h-5 rounded-full text-white text-[9px] font-black flex items-center justify-center"
                           style={{ background: c.userInfo.color || "#4A6741" }}
                         >
                           {c.userInfo.fullName[0]}
                         </span>
-                        <span className="text-[10px] font-black text-[#2D3025] dark:text-[#E8ECE0]">
-                          {c.userInfo.fullName}
-                        </span>
+                        <span className="text-[10px] font-black text-[#2D3025]">{c.userInfo.fullName}</span>
                       </div>
                       <span className="text-[8px] text-[#8D7F72]">
                         {new Date(c.createdAt).toLocaleDateString("fa-IR")}
                       </span>
                     </div>
-                    <p className="text-[10px] text-[#3D3D3D] dark:text-[#D6CFC3]">{c.body}</p>
+                    <p className="text-[10px] text-[#2D3025]">{c.body}</p>
                   </div>
                 ))
               ) : (
@@ -197,7 +184,7 @@ export function CommentReactions({ entityType, entityId }: { entityType: string;
               )}
             </div>
 
-            {/* Add comment input */}
+            {/* Input */}
             <div className="flex items-center gap-1.5 mt-2">
               <input
                 type="text"
@@ -210,7 +197,7 @@ export function CommentReactions({ entityType, entityId }: { entityType: string;
                   }
                 }}
                 placeholder="دیدگاه خود را بنویسید..."
-                className="flex-1 text-[10px] font-bold p-2.5 rounded-xl border border-[#E6DFD3] bg-white dark:bg-[#20241A] focus:outline-none focus:border-[#4A6741]"
+                className="flex-1 text-[10px] font-bold p-2.5 rounded-xl border border-[#E6DFD3] bg-white focus:outline-none focus:border-[#4A6741]"
               />
               <button
                 onClick={handleAddComment}

@@ -55,9 +55,9 @@ export function ChallengeCard({
         </div>
       </div>
       <span
-        className={`shrink-0 text-[11px] font-black num px-2 py-1 rounded-xl ${done ? "bg-moss/15 text-moss" : "bg-gold/15 text-gold"}`}
+        className={`shrink-0 text-[11px] font-black num px-2 py-1 rounded-xl flex items-center gap-0.5 ${done ? "bg-moss/15 text-moss" : "bg-gold/15 text-gold"}`}
       >
-        {done ? "✓" : "+"}{faNum(challenge.challenge.points)}
+        {done ? <CheckCircle2 size={12} /> : "+"}{faNum(challenge.challenge.points)}
       </span>
     </div>
   );

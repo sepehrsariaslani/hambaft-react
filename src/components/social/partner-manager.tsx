@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { UserPlus, Users, X, Check, Trash2, Link2, Copy, Send, ChevronDown, ChevronUp } from "lucide-react";
+import { UserPlus, Users, X, Check, Trash2, Link2, Copy, Send, ChevronDown, ChevronUp, Flame } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { NudgeSender } from "./nudge-sender";
 
@@ -171,8 +171,8 @@ export function PartnerManager({ goalId, onPartnerAdded }: { goalId?: string; on
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] font-black text-[#2D3025] truncate">{p.partner.fullName}</p>
-                      <p className="text-[8px] text-[#8D7F72]">
-                        سطح {p.partner.level} • {p.partner.streak}🔥 استریک
+                      <p className="text-[8px] text-[#8D7F72] flex items-center gap-1">
+                        سطح {p.partner.level} • {p.partner.streak} <Flame className="w-3 h-3 text-orange-500 inline" /> استریک
                       </p>
                     </div>
                     <NudgeSender partnerId={p.partner.id} partnerName={p.partner.fullName} />
@@ -262,7 +262,7 @@ export function PartnerManager({ goalId, onPartnerAdded }: { goalId?: string; on
                       type="text"
                       value={inviteMessage}
                       onChange={(e) => setInviteMessage(e.target.value)}
-                      placeholder="بیا با هم اهدافمون رو پیش ببریم! 💪"
+                      placeholder="بیا با هم اهدافمون رو پیش ببریم!"
                       className="w-full text-[10px] font-bold p-2.5 rounded-xl border border-[#E6DFD3] bg-white"
                     />
                   </div>

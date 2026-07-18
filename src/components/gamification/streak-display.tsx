@@ -1,11 +1,12 @@
 "use client";
 
 import React from "react";
+import { Flame } from "lucide-react";
 
 export function StreakDisplay({ current, best }: { current: number; best: number }) {
   return (
     <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-gradient-to-l from-orange-50 to-amber-50 border border-orange-200/80 text-right">
-      <div className="text-3xl">🔥</div>
+      <Flame className="w-8 h-8 text-orange-500 shrink-0" />
       <div className="flex-1">
         <div className="flex items-center justify-between">
           <span className="text-[10px] text-orange-600 font-bold">بهترین: {best} روز</span>

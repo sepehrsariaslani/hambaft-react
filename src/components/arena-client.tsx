@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Trophy, Swords, Users2, Waves, Crown } from "lucide-react";
+import { Trophy, Swords, Users2, Waves, Crown, Flame } from "lucide-react";
 import { Avatar } from "@/components/ui";
 import { FeedList } from "@/components/widgets/display";
 import { DailyChallengesDisplay } from "@/components/challenges/challenge-card";
@@ -140,8 +140,15 @@ function LeadersTab({ leaders, myId }: { leaders: Leader[]; myId: string }) {
             </div>
             <div className="text-left shrink-0">
               <p className="num text-[15px] font-black text-[#2D3025]">{faCompact(l.totalPoints)}</p>
-              <p className="text-[9px] text-[#4A6741] font-black num">
-                {l.streakDays > 0 ? `${faNum(l.streakDays)} روز پیاپی` : "—"}
+              <p className="text-[9px] text-[#4A6741] font-black num flex items-center gap-1">
+                {l.streakDays > 0 ? (
+                  <>
+                    <Flame className="w-3 h-3 text-orange-500 inline" />
+                    <span>{faNum(l.streakDays)} روز پیاپی</span>
+                  </>
+                ) : (
+                  "—"
+                )}
               </p>
             </div>
           </div>

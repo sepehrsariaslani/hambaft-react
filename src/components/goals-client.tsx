@@ -2,7 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Target, Plus, X } from "lucide-react";
+import { Target, Plus, X, Check } from "lucide-react";
 import { GoalCard } from "@/components/widgets/display";
 import { EmptyState } from "@/components/ui";
 import { GOAL_CATEGORY, POINTS } from "@/lib/gamification";
@@ -89,7 +89,10 @@ export function GoalsClient({
 
           {completed.length > 0 && (
             <>
-              <p className="text-[12px] font-black text-taupe mt-6 mb-2.5 px-1">تکمیل‌شده‌ها ✓</p>
+              <p className="text-[12px] font-black text-taupe mt-6 mb-2.5 px-1 flex items-center gap-1">
+                <Check className="w-3.5 h-3.5 text-moss" />
+                <span>تکمیل‌شده‌ها</span>
+              </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 opacity-75">
                 {completed.map((g, i) => (
                   <GoalCard key={g.goal.id} goal={g.goal} areaName={g.areaName} areaColor={g.areaColor} memberCount={memberCounts[g.goal.id] ?? 0} delay={i * 0.05} />

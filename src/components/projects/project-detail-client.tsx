@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Plus, CheckSquare, Square, Trash2, FolderKanban } from "lucide-react";
+import { ArrowRight, Plus, CheckSquare, Square, Trash2, FolderKanban, Target } from "lucide-react";
 import { ProofUploader } from "@/components/social/proof-uploader";
 import { CommentReactions } from "@/components/social/comment-reactions";
 
@@ -60,12 +60,14 @@ export function ProjectDetailClient({ project }: { project: any }) {
       {/* Hero */}
       <div className="p-5 rounded-3xl bg-white border border-[#E6DFD3] space-y-3">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] font-black text-[#4A6741] bg-[#E8ECE0] px-2.5 py-1 rounded-xl">
-            📂 پروژه
+          <span className="text-[10px] font-black text-[#4A6741] bg-[#E8ECE0] px-2.5 py-1 rounded-xl flex items-center gap-1">
+            <FolderKanban className="w-3.5 h-3.5 inline" />
+            <span>پروژه</span>
           </span>
           {project.goalTitle && (
-            <span className="text-[10px] text-[#8D7F72] font-bold">
-              🎯 {project.goalTitle}
+            <span className="text-[10px] text-[#8D7F72] font-bold flex items-center gap-1">
+              <Target className="w-3.5 h-3.5 text-[#4A6741] inline" />
+              <span>{project.goalTitle}</span>
             </span>
           )}
         </div>

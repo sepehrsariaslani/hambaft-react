@@ -276,16 +276,16 @@ export function ProofUploader({ entityType, entityId }: { entityType: string; en
               )}
 
               {/* Inputs */}
-              <div>
-                <label className="text-[10px] font-black text-[#8D7F72] block mb-1">کپشن (اختیاری)</label>
-                <input
-                  type="text"
-                  value={caption}
-                  onChange={(e) => setCaption(e.target.value)}
-                  placeholder="مثلاً: تمرین امروز تکمیل شد 💪"
-                  className="w-full text-[10px] font-bold p-2.5 rounded-xl border border-[#E6DFD3] bg-white"
-                />
-              </div>
+                  <div>
+                    <label className="text-[10px] font-black text-[#8D7F72] block mb-1">کپشن (اختیاری)</label>
+                    <input
+                      type="text"
+                      value={caption}
+                      onChange={(e) => setCaption(e.target.value)}
+                      placeholder="مثلاً: تمرین امروز تکمیل شد"
+                      className="w-full text-[10px] font-bold p-2.5 rounded-xl border border-[#E6DFD3] bg-white"
+                    />
+                  </div>
 
               <div>
                 <label className="text-[10px] font-black text-[#8D7F72] block mb-1">تأمل و یادداشت (اختیاری)</label>

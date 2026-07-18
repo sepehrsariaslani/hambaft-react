@@ -1,6 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, Lock, Users, TrendingUp, MessageCircle, FolderGit2, CheckSquare } from "lucide-react";
+import { ArrowRight, Lock, Users, TrendingUp, MessageCircle, FolderGit2, CheckSquare, Check } from "lucide-react";
 import { getCurrentUser } from "@/server/auth";
 import { canViewGoal, getGoalDetail, getDashboard } from "@/server/queries";
 import { AppShell } from "@/components/app-shell";
@@ -57,7 +57,7 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ id:
 
         <h1 className={`display text-[21px] leading-8 ${g.status === "completed" ? "text-taupe" : "text-ink"}`}>
           {g.title}
-          {g.status === "completed" && <span className="ms-2 text-[11px] text-moss align-middle">✓ تکمیل‌شده</span>}
+          {g.status === "completed" && <span className="ms-2 text-[11px] text-moss align-middle inline-flex items-center gap-1"><Check className="w-3.5 h-3.5" /> تکمیل‌شده</span>}
         </h1>
         {g.description && <p className="text-[12.5px] text-taupe leading-6 mt-2">{g.description}</p>}
         {!data.isOwner && <p className="text-[11px] font-bold text-sage mt-2">هدفِ {data.ownerName}</p>}

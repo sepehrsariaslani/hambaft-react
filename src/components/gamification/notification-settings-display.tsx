@@ -2,6 +2,10 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import {
+  Bell, Sparkles, Trophy, Target, Users, CheckCircle2, Heart, Zap,
+  ClipboardList, Flame, Clock, Settings, type LucideIcon
+} from "lucide-react";
 
 export interface NotificationSettings {
   pushEnabled: boolean;
@@ -18,19 +22,19 @@ export interface NotificationSettings {
   system: boolean;
 }
 
-const TOGGLE_ITEMS: { key: keyof NotificationSettings; label: string; icon: string }[] = [
-  { key: "pushEnabled", label: "پوش نوتیفیکیشن مرورگر", icon: "🔔" },
-  { key: "levelUp", label: "اعلان ارتقای سطح", icon: "🎉" },
-  { key: "badgeEarned", label: "اعلان دریافت نشان", icon: "🏆" },
-  { key: "challengeCompleted", label: "اعلان تکمیل چالش", icon: "🎯" },
-  { key: "partnerInvite", label: "دعوتنامه‌های پارتنر", icon: "🤝" },
-  { key: "partnerAccepted", label: "تأیید پارتنر جدید", icon: "✅" },
-  { key: "reactionReceived", label: "واکنش پارتنرها", icon: "❤️" },
-  { key: "nudgeReceived", label: "ناج‌های تشویقی", icon: "💪" },
-  { key: "dailyReminder", label: "یادآوری خلاصه روزانه", icon: "📋" },
-  { key: "streakMilestone", label: "نقاط عطف استریک", icon: "🔥" },
-  { key: "goalDeadline", label: "مهلت‌های پیش‌رو اهداف", icon: "⏳" },
-  { key: "system", label: "اطلاعیه‌های سیستمی", icon: "⚙️" },
+const TOGGLE_ITEMS: { key: keyof NotificationSettings; label: string; icon: LucideIcon }[] = [
+  { key: "pushEnabled", label: "پوش نوتیفیکیشن مرورگر", icon: Bell },
+  { key: "levelUp", label: "اعلان ارتقای سطح", icon: Sparkles },
+  { key: "badgeEarned", label: "اعلان دریافت نشان", icon: Trophy },
+  { key: "challengeCompleted", label: "اعلان تکمیل چالش", icon: Target },
+  { key: "partnerInvite", label: "دعوتنامه‌های پارتنر", icon: Users },
+  { key: "partnerAccepted", label: "تأیید پارتنر جدید", icon: CheckCircle2 },
+  { key: "reactionReceived", label: "واکنش پارتنرها", icon: Heart },
+  { key: "nudgeReceived", label: "ناج‌های تشویقی", icon: Zap },
+  { key: "dailyReminder", label: "یادآوری خلاصه روزانه", icon: ClipboardList },
+  { key: "streakMilestone", label: "نقاط عطف استریک", icon: Flame },
+  { key: "goalDeadline", label: "مهلت‌های پیش‌رو اهداف", icon: Clock },
+  { key: "system", label: "اطلاعیه‌های سیستمی", icon: Settings },
 ];
 
 export function NotificationSettingsDisplay() {
@@ -108,12 +112,13 @@ export function NotificationSettingsDisplay() {
     <div className="space-y-2 text-right" dir="rtl">
       {TOGGLE_ITEMS.map((item) => {
         const isOn = settings[item.key];
+        const Icon = item.icon;
         return (
           <div
             key={item.key}
             className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-[#E6DFD3]"
           >
-            <span className="text-xl">{item.icon}</span>
+            <Icon className="w-5 h-5 text-[#4A6741]" />
             <span className="flex-1 text-[11px] font-black text-[#2D3025]">{item.label}</span>
             <button
               onClick={() => handleToggle(item.key)}

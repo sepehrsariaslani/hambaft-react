@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { FolderKanban, Plus, CheckCircle, Clock, Trash2, Search, X } from "lucide-react";
+import { FolderKanban, Plus, CheckCircle, Clock, Trash2, Search, X, Target } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export interface ProjectItem {
@@ -133,8 +133,9 @@ export function ProjectsClient({
                   <div>
                     <h3 className="text-xs font-black text-[#2D3025]">{p.title}</h3>
                     {p.goalTitle && (
-                      <span className="text-[9px] text-[#8D7F72] font-bold mt-0.5 block">
-                        🎯 هدف مرتبط: {p.goalTitle}
+                      <span className="text-[9px] text-[#8D7F72] font-bold mt-0.5 flex items-center gap-1">
+                        <Target className="w-3 h-3 text-[#4A6741] inline" />
+                        <span>هدف مرتبط: {p.goalTitle}</span>
                       </span>
                     )}
                   </div>

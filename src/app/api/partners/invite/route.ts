@@ -111,7 +111,7 @@ export async function POST(req: Request) {
     actorId: user.id,
     type: "partner",
     title: `${user.name} شما را به عنوان پارتنر اضافه کرد`,
-    body: message || "از حالا با هم در مسیر پیشرفت همراهید! 💪",
+    body: message || "از حالا با هم در مسیر پیشرفت همراهید!",
     refType: "partner",
     refId: user.id,
   });

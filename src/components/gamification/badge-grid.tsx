@@ -2,6 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
+import { Trophy, Award, Medal, Crown, Zap, Flame, Check, Lock, Star, Target, HeartHandshake } from "lucide-react";
 
 export type BadgeRarity = "Common" | "Rare" | "Epic" | "Legendary";
 
@@ -15,6 +16,18 @@ export interface BadgeDefinition {
   awardedAt?: string | null;
 }
 
+const BADGE_LUCIDE_ICONS: Record<string, any> = {
+  medal: Medal,
+  award: Award,
+  trophy: Trophy,
+  crown: Crown,
+  zap: Zap,
+  flame: Flame,
+  star: Star,
+  target: Target,
+  "heart-handshake": HeartHandshake,
+};
+
 const RARITY_CONFIG: Record<
   BadgeRarity,
   { bg: string; border: string; text: string; label: string; shadow: string }
@@ -27,6 +40,7 @@ const RARITY_CONFIG: Record<
 
 export function BadgeCard({ badge }: { badge: BadgeDefinition }) {
   const rarity = RARITY_CONFIG[badge.rarity] || RARITY_CONFIG.Common;
+  const IconComponent = BADGE_LUCIDE_ICONS[badge.icon] || Award;
 
   return (
     <motion.div
@@ -38,17 +52,19 @@ export function BadgeCard({ badge }: { badge: BadgeDefinition }) {
       whileHover={badge.earned ? { scale: 1.05 } : {}}
       whileTap={badge.earned ? { scale: 0.95 } : {}}
     >
-      <div className="text-3xl mb-1">{badge.icon || "🏆"}</div>
+      <div className="flex justify-center mb-1 text-[#4A6741]">
+        <IconComponent className="w-6 h-6" />
+      </div>
       <div className={`text-[10px] font-black leading-tight ${badge.earned ? rarity.text : "text-gray-400"}`}>
         {badge.badgeNameFa}
       </div>
       {badge.earned ? (
-        <div className="absolute -top-1 -left-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-white text-[8px] font-black">
-          ✓
+        <div className="absolute -top-1 -left-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center text-white">
+          <Check className="w-2.5 h-2.5" />
         </div>
       ) : (
-        <div className="absolute -top-1 -left-1 w-4 h-4 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-[8px] font-black">
-          🔒
+        <div className="absolute -top-1 -left-1 w-4 h-4 bg-gray-300 rounded-full flex items-center justify-center text-gray-600">
+          <Lock className="w-2.5 h-2.5" />
         </div>
       )}
       <div className={`text-[8px] mt-0.5 font-bold ${badge.earned ? "text-[#8D7F72]" : "text-gray-400"}`}>

@@ -10,6 +10,7 @@ import {
   Target,
   Users2,
   FolderKanban,
+  Wallet,
   User,
   Plus,
   Bell,
@@ -23,6 +24,7 @@ const NAV = [
   { href: "/", fa: "امروز", icon: Sun },
   { href: "/tasks", fa: "تسک‌ها", icon: ListChecks },
   { href: "/projects", fa: "پروژه‌ها", icon: FolderKanban },
+  { href: "/finance", fa: "مالی", icon: Wallet },
   { href: "/goals", fa: "اهداف", icon: Target },
   { href: "/arena", fa: "باشگاه", icon: Users2 },
 ];
@@ -106,22 +108,23 @@ export function AppShell({
 
       {/* ─── ناوبری پایین ─── */}
       <nav className="fixed bottom-0 inset-x-0 z-40">
-        <div className="mx-auto max-w-lg md:max-w-2xl px-4 safe-b">
-          <div className="mb-3 rounded-[26px] bg-night/95 backdrop-blur-xl shadow-[0_12px_40px_-10px_rgba(27,29,22,0.5)] border border-white/5 h-[62px] flex items-center justify-around px-2">
+        <div className="mx-auto max-w-lg md:max-w-2xl px-3 safe-b">
+          <div className="mb-3 rounded-[26px] bg-night/95 backdrop-blur-xl shadow-[0_12px_40px_-10px_rgba(27,29,22,0.5)] border border-white/5 h-[62px] flex items-center justify-around px-1 overflow-x-auto">
             <NavBtn item={NAV[0]} active={isActive(pathname, NAV[0].href)} />
             <NavBtn item={NAV[1]} active={isActive(pathname, NAV[1].href)} />
             <NavBtn item={NAV[2]} active={isActive(pathname, NAV[2].href)} />
             <div className="flex justify-center shrink-0">
               <button
                 onClick={() => setSheet(true)}
-                className="nav-fab w-11 h-11 -mt-6 rounded-2xl bg-terra text-white flex items-center justify-center border-4 border-cream shadow-lg active:scale-95 transition-transform"
+                className="nav-fab w-10 h-10 -mt-6 rounded-2xl bg-terra text-white flex items-center justify-center border-4 border-cream shadow-lg active:scale-95 transition-transform"
                 aria-label="افزودن سریع"
               >
-                <Plus size={20} strokeWidth={2.6} />
+                <Plus size={18} strokeWidth={2.6} />
               </button>
             </div>
             <NavBtn item={NAV[3]} active={isActive(pathname, NAV[3].href)} />
             <NavBtn item={NAV[4]} active={isActive(pathname, NAV[4].href)} />
+            <NavBtn item={NAV[5]} active={isActive(pathname, NAV[5].href)} />
           </div>
         </div>
       </nav>

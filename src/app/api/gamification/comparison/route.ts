@@ -22,7 +22,6 @@ export async function GET(req: Request) {
   }
 
   if (!partnerUser) {
-    // Pick the first available user that isn't me
     [partnerUser] = await db
       .select()
       .from(users)
@@ -36,12 +35,10 @@ export async function GET(req: Request) {
 
   const [meUser] = await db.select().from(users).where(eq(users.id, user.id)).limit(1);
 
-  // Stats for me
   const [meTasks] = await db.select({ n: sql<number>`count(*)::int` }).from(tasks).where(eq(tasks.ownerId, user.id));
   const [meHabits] = await db.select({ n: sql<number>`count(*)::int` }).from(habitLogs).where(eq(habitLogs.userId, user.id));
   const [meProofs] = await db.select({ n: sql<number>`count(*)::int` }).from(proofs).where(eq(proofs.userId, user.id));
 
-  // Stats for partner
   const [pTasks] = await db.select({ n: sql<number>`count(*)::int` }).from(tasks).where(eq(tasks.ownerId, partnerUser.id));
   const [pHabits] = await db.select({ n: sql<number>`count(*)::int` }).from(habitLogs).where(eq(habitLogs.userId, partnerUser.id));
   const [pProofs] = await db.select({ n: sql<number>`count(*)::int` }).from(proofs).where(eq(proofs.userId, partnerUser.id));
@@ -56,7 +53,7 @@ export async function GET(req: Request) {
     {
       field: "points",
       label: "امتیاز کل",
-      icon: "⭐",
+      icon: "star",
       me: meUser?.totalPoints ?? 0,
       partner: partnerUser.totalPoints,
       ahead: compare(meUser?.totalPoints ?? 0, partnerUser.totalPoints),
@@ -64,7 +61,7 @@ export async function GET(req: Request) {
     {
       field: "level",
       label: "سطح",
-      icon: "🏅",
+      icon: "level",
       me: meUser?.level ?? 1,
       partner: partnerUser.level,
       ahead: compare(meUser?.level ?? 1, partnerUser.level),
@@ -72,7 +69,7 @@ export async function GET(req: Request) {
     {
       field: "streak",
       label: "روزهای استریک",
-      icon: "🔥",
+      icon: "streak",
       me: meUser?.streakDays ?? 0,
       partner: partnerUser.streakDays,
       ahead: compare(meUser?.streakDays ?? 0, partnerUser.streakDays),
@@ -80,7 +77,7 @@ export async function GET(req: Request) {
     {
       field: "tasks",
       label: "تسک‌های کامل‌شده",
-      icon: "✅",
+      icon: "tasks",
       me: meTasks?.n ?? 0,
       partner: pTasks?.n ?? 0,
       ahead: compare(meTasks?.n ?? 0, pTasks?.n ?? 0),
@@ -88,7 +85,7 @@ export async function GET(req: Request) {
     {
       field: "habits",
       label: "چک‌این عادت‌ها",
-      icon: "🌱",
+      icon: "habits",
       me: meHabits?.n ?? 0,
       partner: pHabits?.n ?? 0,
       ahead: compare(meHabits?.n ?? 0, pHabits?.n ?? 0),
@@ -96,7 +93,7 @@ export async function GET(req: Request) {
     {
       field: "proofs",
       label: "اثبات‌ها",
-      icon: "📸",
+      icon: "proofs",
       me: meProofs?.n ?? 0,
       partner: pProofs?.n ?? 0,
       ahead: compare(meProofs?.n ?? 0, pProofs?.n ?? 0),

@@ -2,14 +2,15 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Zap, Flame, Sprout, Users, Target, Sparkles, Send, type LucideIcon } from "lucide-react";
 
-const TEMPLATES = [
-  { index: 0, icon: "💪", message_fa: "یادت نره امروزت رو ببافی ✦" },
-  { index: 1, icon: "🔥", message_fa: "من سرجامم، نوبت توئه!" },
-  { index: 2, icon: "🌱", message_fa: "یه قدم کوچیک هم عالیه — شروع کن" },
-  { index: 3, icon: "🤝", message_fa: "امروز را با هم می‌بریم جلو" },
-  { index: 4, icon: "🎯", message_fa: "بشور و بپاش، هدف‌هات منتظرن :)" },
-  { index: 5, icon: "✨", message_fa: "تو می‌تونی، منتظر خبرای خوبتم!" },
+const TEMPLATES: { index: number; icon: LucideIcon; message_fa: string }[] = [
+  { index: 0, icon: Zap, message_fa: "یادت نره امروزت رو ببافی ✦" },
+  { index: 1, icon: Flame, message_fa: "من سرجامم، نوبت توئه!" },
+  { index: 2, icon: Sprout, message_fa: "یه قدم کوچیک هم عالیه — شروع کن" },
+  { index: 3, icon: Users, message_fa: "امروز را با هم می‌بریم جلو" },
+  { index: 4, icon: Target, message_fa: "بشور و بپاش، هدف‌هات منتظرن :)" },
+  { index: 5, icon: Sparkles, message_fa: "تو می‌تونی، منتظر خبرای خوبتم!" },
 ];
 
 interface NudgeSenderProps {
@@ -58,7 +59,8 @@ export function NudgeSender({ partnerId, partnerName }: NudgeSenderProps) {
           justSent ? "bg-[#4A6741] text-white" : "bg-gradient-to-l from-[#E26645] to-[#C94B2A] text-white hover:scale-105"
         }`}
       >
-        {justSent ? "✓ ارسال شد!" : "💪 ناج بفرست"}
+        <Zap className="w-3.5 h-3.5" />
+        <span>{justSent ? "ارسال شد!" : "ناج بفرست"}</span>
       </button>
 
       <AnimatePresence>
@@ -72,17 +74,20 @@ export function NudgeSender({ partnerId, partnerName }: NudgeSenderProps) {
             <div className="text-[10px] font-black text-[#2D3025]">ناج تشویقی به {partnerName}</div>
 
             <div className="grid grid-cols-3 gap-1">
-              {TEMPLATES.map((t) => (
-                <button
-                  key={t.index}
-                  onClick={() => handleSend(t.message_fa)}
-                  disabled={sending}
-                  className="p-1.5 rounded-xl bg-[#F9F6EE] hover:bg-[#E8ECE0] border border-[#E6DFD3] text-center cursor-pointer transition-colors disabled:opacity-50"
-                >
-                  <div className="text-base">{t.icon}</div>
-                  <div className="text-[7px] font-bold text-[#8D7F72] truncate">{t.message_fa}</div>
-                </button>
-              ))}
+              {TEMPLATES.map((t) => {
+                const Icon = t.icon;
+                return (
+                  <button
+                    key={t.index}
+                    onClick={() => handleSend(t.message_fa)}
+                    disabled={sending}
+                    className="p-1.5 rounded-xl bg-[#F9F6EE] hover:bg-[#E8ECE0] border border-[#E6DFD3] text-center cursor-pointer transition-colors disabled:opacity-50 flex flex-col items-center gap-1"
+                  >
+                    <Icon className="w-4 h-4 text-[#4A6741]" />
+                    <div className="text-[7px] font-bold text-[#8D7F72] truncate w-full">{t.message_fa}</div>
+                  </button>
+                );
+              })}
             </div>
 
             <div className="flex gap-1 pt-1">
@@ -99,9 +104,9 @@ export function NudgeSender({ partnerId, partnerName }: NudgeSenderProps) {
               <button
                 onClick={() => handleSend()}
                 disabled={sending || !customMessage.trim()}
-                className="px-2.5 py-1.5 bg-[#4A6741] text-white text-[10px] font-bold rounded-lg cursor-pointer disabled:opacity-50"
+                className="px-2.5 py-1.5 bg-[#4A6741] text-white text-[10px] font-bold rounded-lg cursor-pointer disabled:opacity-50 flex items-center justify-center"
               >
-                ارسال
+                <Send className="w-3 h-3 rotate-180" />
               </button>
             </div>
           </motion.div>

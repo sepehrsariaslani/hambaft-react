@@ -44,7 +44,7 @@ export async function GET(req: Request) {
       difficulty: h.difficulty,
       points_reward: h.pointsReward,
       status: h.status === "completed" ? "تکمیل‌شده" : "در_حال_انجام",
-      icon: "🎯",
+      icon: "target",
     }));
 
     return Response.json({ ok: true, data: { challenges: items } });
@@ -69,7 +69,7 @@ export async function GET(req: Request) {
     title_fa: ch.title,
     description: ch.description,
     description_fa: ch.description,
-    icon: "🎯",
+    icon: "target",
     challenge_type: ch.metric,
     difficulty: ch.difficulty,
     category: "productivity",

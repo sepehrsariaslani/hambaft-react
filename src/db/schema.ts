@@ -433,3 +433,105 @@ export const pushSubscriptions = pgTable("push_subscriptions", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+/* ─── حساب‌های بانکی ─── */
+export const bankAccounts = pgTable("bank_accounts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  bankName: text("bank_name").notNull(),
+  accountName: text("account_name").notNull(),
+  balance: integer("balance").notNull().default(0),
+  accountType: text("account_type").notNull().default("checking"), // checking | savings | credit | investment
+  isCredit: boolean("is_credit").notNull().default(false),
+  creditLimit: integer("credit_limit").notNull().default(0),
+  creditDebt: integer("credit_debt").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/* ─── تراکنش‌های مالی ─── */
+export const transactions = pgTable(
+  "transactions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    bankAccountId: uuid("bank_account_id").references(() => bankAccounts.id, { onDelete: "set null" }),
+    toBankAccountId: uuid("to_bank_account_id").references(() => bankAccounts.id, { onDelete: "set null" }),
+    type: text("type").notNull().default("expense"), // income | expense | transfer
+    amount: integer("amount").notNull(),
+    category: text("category").notNull().default("other"),
+    subcategory: text("subcategory").notNull().default(""),
+    description: text("description").notNull().default(""),
+    date: date("date").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("transactions_user_date_idx").on(t.userId, t.date)]
+);
+
+/* ─── بدهی‌ها و طلب‌ها (Debts) ─── */
+export const debts = pgTable("debts", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  personName: text("person_name").notNull(),
+  type: text("type").notNull().default("debt"), // debt (بدهی) | loan (طلب)
+  amount: integer("amount").notNull(),
+  dueDate: date("due_date"),
+  completed: boolean("completed").notNull().default(false),
+  notes: text("notes").notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/* ─── دارایی‌ها و سرمایه‌گذاری‌ها (Assets) ─── */
+export const assets = pgTable("assets", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  symbol: text("symbol").notNull().default(""),
+  type: text("type").notNull().default("gold"), // gold | crypto | stock | currency | real_estate | other
+  amount: integer("amount").notNull().default(1),
+  purchasePrice: integer("purchase_price").notNull().default(0),
+  currentPrice: integer("current_price").notNull().default(0),
+  notes: text("notes").notNull().default(""),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/* ─── خریدهای اقساطی (Installments) ─── */
+export const installments = pgTable("installments", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  totalAmount: integer("total_amount").notNull(),
+  installmentAmount: integer("installment_amount").notNull(),
+  totalMonths: integer("total_months").notNull().default(12),
+  paidMonths: integer("paid_months").notNull().default(0),
+  dayOfMonth: integer("day_of_month").notNull().default(1),
+  startDate: date("start_date").notNull(),
+  category: text("category").notNull().default("shopping"),
+  completed: boolean("completed").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/* ─── اشتراک‌ها (Subscriptions) ─── */
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  price: integer("price").notNull(),
+  billingCycle: text("billing_cycle").notNull().default("monthly"), // monthly | yearly
+  nextBillingDate: date("next_billing_date").notNull(),
+  status: text("status").notNull().default("active"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+

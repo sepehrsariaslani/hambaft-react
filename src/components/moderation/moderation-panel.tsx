@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, UserX, Flag, Settings } from "lucide-react";
+import { Shield, Ban, Flag, Settings, Users, ClipboardList, User } from "lucide-react";
 
 export function ReportModal({
   reportedUser,
@@ -142,8 +142,8 @@ function BlockedList() {
     <div className="space-y-2">
       {blockedUsers.map((b) => (
         <div key={b.block_id} className="flex items-center gap-3 p-3 rounded-2xl bg-white border border-[#E6DFD3]">
-          <div className="w-8 h-8 rounded-full bg-[#E8ECE0] flex items-center justify-center text-sm font-black text-[#4A6741]">
-            👤
+          <div className="w-8 h-8 rounded-full bg-[#E8ECE0] flex items-center justify-center text-[#4A6741]">
+            <User className="w-4 h-4" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-[11px] font-black text-[#2D3025] truncate">
@@ -221,21 +221,24 @@ function AdminPanel() {
   if (loading) return <div className="text-center py-10 text-xs text-[#8D7F72]">در حال بارگذاری پنل مدیریت...</div>;
 
   const statCards = [
-    { label: "کاربران", value: stats.users || 0, icon: "👥" },
-    { label: "گزارش‌ها", value: stats.reports_total || 0, icon: "📋" },
-    { label: "مسدودشده‌ها", value: stats.blocks_total || 0, icon: "🚫" },
+    { label: "کاربران", value: stats.users || 0, icon: Users },
+    { label: "گزارش‌ها", value: stats.reports_total || 0, icon: ClipboardList },
+    { label: "مسدودشده‌ها", value: stats.blocks_total || 0, icon: Ban },
   ];
 
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-2">
-        {statCards.map((s) => (
-          <div key={s.label} className="p-3 rounded-2xl bg-white border border-[#E6DFD3] text-center">
-            <div className="text-lg">{s.icon}</div>
-            <div className="text-sm font-black text-[#2D3025]">{s.value}</div>
-            <div className="text-[9px] text-[#8D7F72] font-bold">{s.label}</div>
-          </div>
-        ))}
+        {statCards.map((s) => {
+          const Icon = s.icon;
+          return (
+            <div key={s.label} className="p-3 rounded-2xl bg-white border border-[#E6DFD3] text-center">
+              <Icon className="w-5 h-5 mx-auto text-[#4A6741] mb-1" />
+              <div className="text-sm font-black text-[#2D3025]">{s.value}</div>
+              <div className="text-[9px] text-[#8D7F72] font-bold">{s.label}</div>
+            </div>
+          );
+        })}
       </div>
 
       <div className="space-y-2 pt-1">
@@ -280,27 +283,30 @@ export function ModerationPanel() {
       <div className="flex bg-[#F9F6EE] p-1 rounded-2xl border border-[#E6DFD3] gap-1">
         <button
           onClick={() => setActiveTab("blocked")}
-          className={`flex-1 py-2 text-[10px] font-black rounded-xl cursor-pointer transition-all ${
+          className={`flex-1 py-2 text-[10px] font-black rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1 ${
             activeTab === "blocked" ? "bg-[#2D3025] text-white" : "text-[#8D7F72]"
           }`}
         >
-          🚫 مسدودشده‌ها
+          <Ban className="w-3.5 h-3.5" />
+          <span>مسدودشده‌ها</span>
         </button>
         <button
           onClick={() => setActiveTab("reports")}
-          className={`flex-1 py-2 text-[10px] font-black rounded-xl cursor-pointer transition-all ${
+          className={`flex-1 py-2 text-[10px] font-black rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1 ${
             activeTab === "reports" ? "bg-[#2D3025] text-white" : "text-[#8D7F72]"
           }`}
         >
-          📋 گزارش‌ها
+          <ClipboardList className="w-3.5 h-3.5" />
+          <span>گزارش‌ها</span>
         </button>
         <button
           onClick={() => setActiveTab("admin")}
-          className={`flex-1 py-2 text-[10px] font-black rounded-xl cursor-pointer transition-all ${
+          className={`flex-1 py-2 text-[10px] font-black rounded-xl cursor-pointer transition-all flex items-center justify-center gap-1 ${
             activeTab === "admin" ? "bg-[#2D3025] text-white" : "text-[#8D7F72]"
           }`}
         >
-          ⚙️ پنل ادمین
+          <Settings className="w-3.5 h-3.5" />
+          <span>پنل ادمین</span>
         </button>
       </div>
 
