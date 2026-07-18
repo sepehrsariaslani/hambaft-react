@@ -6,6 +6,8 @@ import { canViewGoal, getGoalDetail, getDashboard } from "@/server/queries";
 import { AppShell } from "@/components/app-shell";
 import { Avatar, ProgressBar, SectionHeader } from "@/components/ui";
 import { ProgressForm, ReactionBar, CommentForm } from "@/components/engage";
+import { ProofUploader } from "@/components/social/proof-uploader";
+import { PartnerManager } from "@/components/social/partner-manager";
 import { faNum, relativeFa, formatJalaliShort } from "@/lib/fa";
 import { GOAL_CATEGORY, goalProgress, goalHealthColor } from "@/lib/gamification";
 
@@ -105,6 +107,16 @@ export default async function GoalDetailPage({ params }: { params: Promise<{ id:
           <ProgressForm goalId={id} unit={g.unit} targetValue={g.targetValue} currentValue={g.currentValue} />
         </section>
       )}
+
+      {/* ─── اثبات پیشرفت ─── */}
+      <section className="card p-4 mb-4 anim-rise">
+        <ProofUploader entityType="goal" entityId={id} />
+      </section>
+
+      {/* ─── مدیریت پارتنرها و اشتراک ─── */}
+      <section className="card p-4 mb-4 anim-rise">
+        <PartnerManager goalId={id} />
+      </section>
 
       {/* ─── واکنش‌ها ─── */}
       <section className="mb-4 anim-rise">

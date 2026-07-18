@@ -339,3 +339,97 @@ export const notifications = pgTable(
   },
   (t) => [index("notifications_user_idx").on(t.userId, t.read)],
 );
+
+/* ─── اثبات‌ها (Proof Uploads) ─── */
+export const proofs = pgTable(
+  "proofs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    targetType: text("target_type").notNull().default("goal"), // goal | project | task | habit
+    targetId: uuid("target_id").notNull(),
+    mediaUrl: text("media_url").notNull(),
+    mediaType: text("media_type").notNull().default("photo"), // photo | video
+    caption: text("caption").notNull().default(""),
+    reflectionNote: text("reflection_note").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("proofs_target_idx").on(t.targetType, t.targetId), index("proofs_user_idx").on(t.userId)],
+);
+
+/* ─── بلاک کردن کاربران (User Blocks) ─── */
+export const userBlocks = pgTable(
+  "user_blocks",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    blockerId: uuid("blocker_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    blockedId: uuid("blocked_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    reason: text("reason").notNull().default(""),
+    notes: text("notes").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("user_blocks_unique").on(t.blockerId, t.blockedId)],
+);
+
+/* ─── گزارش تخلف (Reports) ─── */
+export const reports = pgTable(
+  "reports",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    reporterId: uuid("reporter_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    reportedUserId: uuid("reported_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    entityType: text("entity_type").notNull().default("user"), // user | comment | proof | reaction
+    entityId: text("entity_id").notNull().default(""),
+    reason: text("reason").notNull(),
+    description: text("description").notNull().default(""),
+    status: text("status").notNull().default("pending"), // pending | reviewed | dismissed | action_taken
+    reviewedBy: uuid("reviewed_by").references(() => users.id, { onDelete: "set null" }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    actionTaken: text("action_taken").notNull().default(""),
+    adminNotes: text("admin_notes").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("reports_reporter_idx").on(t.reporterId), index("reports_status_idx").on(t.status)],
+);
+
+/* ─── تنظیمات نوتیفیکیشن (Notification Settings) ─── */
+export const notificationSettings = pgTable("notification_settings", {
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => users.id, { onDelete: "cascade" }),
+  nudge: boolean("nudge").notNull().default(true),
+  badge: boolean("badge").notNull().default(true),
+  points: boolean("points").notNull().default(true),
+  reaction: boolean("reaction").notNull().default(true),
+  comment: boolean("comment").notNull().default(true),
+  challenge: boolean("challenge").notNull().default(true),
+  partner: boolean("partner").notNull().default(true),
+  goal: boolean("goal").notNull().default(true),
+  habit: boolean("habit").notNull().default(true),
+  task: boolean("task").notNull().default(true),
+  streak: boolean("streak").notNull().default(true),
+  summary: boolean("summary").notNull().default(true),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
+/* ─── اشتراک Push Notification ─── */
+export const pushSubscriptions = pgTable("push_subscriptions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  endpoint: text("endpoint").notNull(),
+  keys: text("keys").notNull().default("{}"),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
