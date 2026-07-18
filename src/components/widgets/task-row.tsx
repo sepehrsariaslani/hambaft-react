@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check, Clock, Trash2, Star } from "lucide-react";
+import { Check, Clock, Trash2, Star, ChevronLeft } from "lucide-react";
 import { faNum } from "@/lib/fa";
 import { PRIORITY_META } from "@/lib/gamification";
 
@@ -112,6 +113,14 @@ export function TaskRow({ task, compact = false }: { task: TaskLite; compact?: b
           </div>
         )}
       </div>
+
+      <Link
+        href={`/tasks/${task.id}`}
+        title="جزئیات تسک"
+        className="shrink-0 w-7 h-7 rounded-lg text-sand hover:text-moss hover:bg-mist flex items-center justify-center transition-colors"
+      >
+        <ChevronLeft size={14} />
+      </Link>
 
       <button
         onClick={remove}

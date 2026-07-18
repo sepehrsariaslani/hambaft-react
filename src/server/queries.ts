@@ -353,6 +353,76 @@ export async function getProfile(userId: string) {
   };
 }
 
+/* ─── پروژه‌ها ─── */
+export async function getProjectsPage(userId: string) {
+  const areaRows = await db.select().from(areas).where(eq(areas.userId, userId)).orderBy(asc(areas.sortOrder));
+  const projectRows = await db
+    .select({
+      p: projects,
+      goalTitle: goals.title,
+      areaName: areas.name,
+      areaColor: areas.color,
+    })
+    .from(projects)
+    .leftJoin(goals, eq(goals.id, projects.goalId))
+    .leftJoin(areas, eq(areas.id, projects.areaId))
+    .where(eq(projects.ownerId, userId))
+    .orderBy(desc(projects.createdAt));
+
+  const projectTasks = await db
+    .select({
+      projectId: tasks.projectId,
+      id: tasks.id,
+      title: tasks.title,
+      status: tasks.status,
+    })
+    .from(tasks)
+    .where(eq(tasks.ownerId, userId));
+
+  const taskGrouped: Record<string, typeof projectTasks> = {};
+  for (const t of projectTasks) {
+    if (t.projectId) {
+      if (!taskGrouped[t.projectId]) taskGrouped[t.projectId] = [];
+      taskGrouped[t.projectId].push(t);
+    }
+  }
+
+  const items = projectRows.map((r) => ({
+    ...r.p,
+    goalTitle: r.goalTitle,
+    areaName: r.areaName,
+    areaColor: r.areaColor,
+    tasks: taskGrouped[r.p.id] || [],
+  }));
+
+  return { areas: areaRows, projects: items };
+}
+
+export async function getProjectDetail(projectId: string, userId: string) {
+  const [p] = await db
+    .select({
+      p: projects,
+      goalTitle: goals.title,
+      areaName: areas.name,
+      areaColor: areas.color,
+    })
+    .from(projects)
+    .leftJoin(goals, eq(goals.id, projects.goalId))
+    .leftJoin(areas, eq(areas.id, projects.areaId))
+    .where(and(eq(projects.id, projectId), eq(projects.ownerId, userId)))
+    .limit(1);
+
+  if (!p) return null;
+
+  const projectTasks = await db
+    .select()
+    .from(tasks)
+    .where(and(eq(tasks.projectId, projectId), eq(tasks.ownerId, userId)))
+    .orderBy(asc(tasks.sortOrder));
+
+  return { ...p, tasks: projectTasks };
+}
+
 /* ─── ورود/معرفی کاربران دمو ─── */
 export async function getDemoUsers() {
   return db
